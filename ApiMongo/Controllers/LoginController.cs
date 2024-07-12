@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ApiMongo.Models;
 using ApiMongo.Services;
+using System.Text.RegularExpressions;
 
 namespace ApiMongo.Controllers
 {
@@ -20,6 +21,15 @@ namespace ApiMongo.Controllers
         [HttpPost]
         public async Task<IActionResult> Post(Login newUser)
         {
+            string patttern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+            Regex regex = new Regex(patttern);
+
+            bool isValid = regex.IsMatch(newUser.Email);
+            Console.WriteLine(isValid ? "email is valid" : "email is invalid");
+            if (!isValid)
+            {
+                return Ok(new { message = "email is invalid" });
+            }
             await _loginServicecs.CreateUserAsync(newUser);
             return CreatedAtAction(nameof(Get), new { id = newUser.Id }, newUser);
         }
